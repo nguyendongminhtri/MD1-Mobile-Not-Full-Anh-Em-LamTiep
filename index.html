@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
+
+</head>
+<body>
+<h1 style="color: green">Điện Thoại 1800I của ADAM</h1>
+<button id="adam" onclick="onOff(this.id)">OFF</button>
+<button id="battery_adam"></button>
+<button id="send_adam" onclick="sendMessage(this.id)">Send</button>
+<button id="read_adam" onclick="readMesAdam()">READ</button>
+
+<br>
+<textarea id="screen_adam" disabled></textarea>
+<hr>
+<h1 style="color: blue;">Điện thoại IP 14 PRO MAX CỦA EVA</h1>
+<button id="eva" onclick="onOff(this.id)">OFF</button>
+<button id="battery_eva"></button>
+<button onclick="sendMessage(this.id)" id="send_eva" class="hide">SEND</button>
+
+<button onclick="readMes()" id="read_eva" class="hide">READ</button>
+<br>
+<textarea id="screen_eva" disabled></textarea>
+
+<script>
+    class Mobile {
+        status;
+        battery;
+        outBox;
+        inBox
+
+        constructor(status, battery, outBox, inBox) {
+            this.status = status;
+            this.battery = battery;
+            this.outBox = [];
+            this.inBox = [];
+        }
+
+        setStatus(status) {
+            this.status = !status;
+        }
+
+        getStatus() {
+            return this.status
+        }
+
+        setBattery(battery) {
+            this.battery = battery
+        }
+
+        getBattery() {
+            return this.battery;
+        }
+
+        getInBox() {
+            return this.inBox
+        }
+
+        setInBox(inBox) {
+            this.inBox = inBox;
+        }
+
+        getOutBox() {
+            return this.outBox
+        }
+
+        setOutBox(outBox) {
+            this.outBox = outBox;
+        }
+    }
+
+    let adam = new Mobile(false, 300);
+    let eva = new Mobile(false, 100)
+
+    function onOff(id) {
+        console.log('this ---->', id)
+        if (id === 'adam') {
+            adam.setStatus(adam.getStatus());
+            if (adam.getStatus()) {
+                document.getElementById('adam').innerHTML = 'ON';
+                document.getElementById('screen_adam').disabled = false;
+                downBatteryAdam()
+            } else {
+                document.getElementById('screen_adam').disabled = true;
+                document.getElementById('adam').innerHTML = 'OFF'
+            }
+        } else {
+            console.log('vao else')
+            eva.setStatus(eva.getStatus());
+            if (eva.getStatus()) {
+                document.getElementById('screen_eva').disabled = false;
+                document.getElementById('eva').innerHTML = 'ON';
+                document.getElementById('read_eva').classList.remove('hide')
+                document.getElementById('send_eva').classList.remove('hide')
+                    , downBatteryEva()
+            } else {
+                document.getElementById('screen_eva').disabled = true;
+                document.getElementById('eva').innerHTML = 'OFF'
+                document.getElementById('read_eva').classList.add('hide')
+                document.getElementById('send_eva').classList.add('hide')
+            }
+        }
+    }
+
+    function showBattery() {
+        document.getElementById('battery_adam').innerHTML = adam.getBattery() + '%'
+        document.getElementById('battery_eva').innerHTML = eva.getBattery() + '%'
+    }
+
+    showBattery();
+    // let number = 3;
+    let batteryDownAdam;
+
+    function downBatteryAdam() {
+        adam.setBattery(adam.getBattery() - 1)
+        document.getElementById('battery_adam').innerHTML = adam.getBattery() + '%'
+        batteryDownAdam = setTimeout(downBatteryAdam, 1000)
+        // document.getElementById('battery_adam').innerHTML = number + '%';
+        // batteryDownAdam = setTimeout(downBattery, 1000);
+        if (adam.getBattery() <= 0) {
+            clearTimeout(batteryDownAdam)
+            document.getElementById('adam').innerHTML = 'OFF';
+            document.getElementById('screen_adam').disabled = true;
+
+        }
+    }
+
+    let batteryDownEva;
+
+    function downBatteryEva() {
+        eva.setBattery(eva.getBattery() - 1)
+        document.getElementById('battery_eva').innerHTML = eva.getBattery() + '%'
+        batteryDownEva = setTimeout(downBatteryEva, 1000)
+        // document.getElementById('battery_adam').innerHTML = number + '%';
+        // batteryDownAdam = setTimeout(downBattery, 1000);
+        if (eva.getBattery() <= 0) {
+            clearTimeout(batteryDownEva)
+            document.getElementById('eva').innerHTML = 'OFF';
+            document.getElementById('screen_eva').disabled = true;
+            document.getElementById('read_eva').classList.add('hide')
+            document.getElementById('send_eva').classList.add('hide')
+        }
+    }
+
+    let count = 0;
+    let count2 = 0;
+    function sendMessage(id) {
+
+
+        let temp;
+        // temp=message.splice()
+        if (id === 'send_adam') {
+            let message = document.getElementById('screen_adam').value;
+            console.log('messsage --->', message)
+            console.log('get Out  Box -->', adam.getOutBox())
+            adam.getOutBox().push(message)
+            eva.setInBox(adam.getOutBox())
+            console.log(eva.getInBox())
+            count++;
+            document.getElementById('screen_eva').value = "ban co " + count + 'tin nhan'
+
+        } else {
+            let message2 = document.getElementById('screen_eva').value;
+            eva.getOutBox().push(message2)
+            adam.setInBox(eva.getOutBox())
+            count2++;
+            document.getElementById('screen_adam').value = "ban co " + count2 + 'tin nhan'
+        }
+
+    }
+
+    function readMes() {
+        document.getElementById('screen_eva').value = eva.getInBox();
+        console.log('o day', eva.getInBox())
+        count = 0;
+    }
+    function readMesAdam() {
+        document.getElementById('screen_adam').value = adam.getInBox();
+        count = 0;
+    }
+    // function senEva(id) {
+    //     let message2 = document.getElementById('screen_eva').value;
+    //     if (id === 'send_eva') {
+    //
+    //         eva.getOutBox().push(message2)
+    //         adam.setInBox(eva.getOutBox())
+    //
+    //         count++;
+    //         document.getElementById('screen_adam').value = "ban co " + count + 'tin nhan'
+    //
+    //     } else {
+    //
+    //         eva.getOutBox().push(message2)
+    //     }
+    // }
+
+    // downBattery();
+</script>
+</body>
+</html>
